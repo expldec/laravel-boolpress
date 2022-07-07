@@ -42,7 +42,7 @@ class PostController extends Controller
         $data = $request->all();
         $post = new Post();
         $post->fill($data);
-        $post->slug = $this->generatePostSlugFromTitle($post->title);
+        $post->slug = Post::generatePostSlugFromTitle($post->title);
         $post->save();
         return redirect()->route('admin.posts.show', ['post' => $post->id]);
     }
@@ -68,7 +68,8 @@ class PostController extends Controller
     public function edit($id)
     {
         $post = Post::findOrFail($id);
-        return view('admin.posts.edit', compact('post'));
+        $category = $post->category;     
+        return view('admin.posts.show', compact('post', 'category'));
     }
 
     /**
@@ -84,9 +85,8 @@ class PostController extends Controller
         $data = $request->all();
 
         $post = Post::findOrFail($id);
-        $post->fill($data);
-        $post->slug = $this->generatePostSlugFromTitle($post->title);
-        $post->save();
+        $data['slug'] = Post::generatePostSlugFromTitle($data['title']);
+        $post->update($data);
 
         return redirect()->route('admin.posts.show', ['post' => $post->id]);
     }
@@ -103,24 +103,12 @@ class PostController extends Controller
         $post->delete();
         return redirect()->route('admin.posts.index');
     }
-    private function generatePostSlugFromTitle($title) {
-        $base_slug = Str::slug($title, '-'); // mio-post
-        $slug = $base_slug; // mio-post
-        $count = 1;
-        $post_found = Post::where('slug', '=', $slug)->first();
-        while ($post_found) {
-            $slug = $base_slug . '-' . $count; // mio-post-1
-            $post_found = Post::where('slug', '=', $slug)->first();
-            $count++; // 2
-        }
-
-        return $slug;
-    }
 
     private function getValidationRules() {
         return [
             'title' => 'required|max:255',
-            'content' => 'required|max:30000'
+            'content' => 'required|max:30000',
+            'category_id' => 'nullable|exists:categories,id'
         ];
     }
 }
