@@ -27,9 +27,26 @@
             <select class="form-control" name="category_id" id="category_id">
                 <option value="">nessuna</option>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" {{ $post->category &&  old('category_id', $post->category->id) == $category->id ? 'selected' : ''}}> {{ $category->name }} </option>
+                    <option value="{{ $category->id }}"
+                        {{ $post->category && old('category_id', $post->category->id) == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }} </option>
                 @endforeach
             </select>
+        </div>
+        <div class="form-group">
+            <h4>Tags</h4>
+
+            @foreach ($tags as $tag)
+                <div class="form-check">
+                    {{-- Per ogni tag, dobbiamo controllare se questo tag è incluso nei tags collegati al post. Se sì, metto checked, se non niente --}}
+                    <input class="form-check-input" type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                        id="tag-{{ $tag->id }}"
+                        {{ ($post->tags->contains($tag) || in_array($tag->id, old('tags', []))) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="tag-{{ $tag->id }}">
+                        {{ $tag->name }}
+                    </label>
+                </div>
+            @endforeach
         </div>
         <div class="form-group">
             <label for="content">Content</label>
