@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::middleware('auth')
-    ->namespace('Admin')
-    ->name('admin.')
-    ->prefix('admin')
-    ->group(function() {
+    ->namespace('Admin')  // cartella dei Controller
+    ->name('admin.')      // pima parte del nome della route
+    ->prefix('admin')     // prefisso comune degli URL
+    ->group(function() {  // il tutto si applica a un gruppo di rotte
         Route::get('/', 'HomeController@index')->name('home');
         Route::resource('posts', 'PostController');
     });
