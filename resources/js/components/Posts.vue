@@ -14,6 +14,42 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-3">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li
+                        class="page-item"
+                        :class="{ disabled: currentPage === 1 }"
+                    >
+                        <a
+                            class="page-link"
+                            href="#"
+                            @click="getPosts(currentPage - 1)"
+                            >Previous</a
+                        >
+                    </li>
+                    <li
+                        v-for="n in lastPage"
+                        :key="n"
+                        class="page-item"
+                        :class="{ active: currentPage === n }"
+                    >
+                        <a class="page-link" href="#" @click="getPosts(n)">{{ n }}</a>
+                    </li>
+                    <li
+                        class="page-item"
+                        :class="{ disabled: currentPage === lastPage }"
+                    >
+                        <a
+                            class="page-link"
+                            href="#"
+                            @click="getPosts(currentPage + 1)"
+                            >Next</a
+                        >
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </template>
 
@@ -23,9 +59,9 @@ export default {
     data() {
         return {
             posts: [],
-            // currentPage: 1,
-            // lastPage: 0,
-            // totalPosts: 0,
+            currentPage: 1,
+            lastPage: 0,
+            totalPosts: 0,
         };
     },
     created() {
@@ -36,15 +72,14 @@ export default {
             axios
                 .get("/api/posts", {
                     params: {
-                        // page: pageNumber,
+                        page: pageNumber,
                     },
                 })
                 .then((resp) => {
-                    console.log(resp.data.results);
-                    this.posts = resp.data.results;
-                    // this.currentPage = resp.data.results.current_page;
-                    // this.lastPage = resp.data.results.last_page;
-                    // this.totalPosts = resp.data.results.total;
+                    this.posts = resp.data.results.data;
+                    this.currentPage = resp.data.results.current_page;
+                    this.lastPage = resp.data.results.last_page;
+                    this.totalPosts = resp.data.results.total;
                 });
         },
         trimText(text, max) {

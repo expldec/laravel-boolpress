@@ -1912,10 +1912,10 @@ __webpack_require__.r(__webpack_exports__);
   name: "Posts",
   data: function data() {
     return {
-      posts: [] // currentPage: 1,
-      // lastPage: 0,
-      // totalPosts: 0,
-
+      posts: [],
+      currentPage: 1,
+      lastPage: 0,
+      totalPosts: 0
     };
   },
   created: function created() {
@@ -1926,13 +1926,14 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get("/api/posts", {
-        params: {// page: pageNumber,
+        params: {
+          page: pageNumber
         }
       }).then(function (resp) {
-        console.log(resp.data.results);
-        _this.posts = resp.data.results; // this.currentPage = resp.data.results.current_page;
-        // this.lastPage = resp.data.results.last_page;
-        // this.totalPosts = resp.data.results.total;
+        _this.posts = resp.data.results.data;
+        _this.currentPage = resp.data.results.current_page;
+        _this.lastPage = resp.data.results.last_page;
+        _this.totalPosts = resp.data.results.total;
       });
     },
     trimText: function trimText(text, max) {
@@ -2004,7 +2005,63 @@ var render = function render() {
         href: "#"
       }
     }, [_vm._v("Card link")])])]);
-  }), 0)]);
+  }), 0), _vm._v(" "), _c("div", {
+    staticClass: "row mt-3"
+  }, [_c("nav", {
+    attrs: {
+      "aria-label": "Page navigation example"
+    }
+  }, [_c("ul", {
+    staticClass: "pagination"
+  }, [_c("li", {
+    staticClass: "page-item",
+    "class": {
+      disabled: _vm.currentPage === 1
+    }
+  }, [_c("a", {
+    staticClass: "page-link",
+    attrs: {
+      href: "#"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.getPosts(_vm.currentPage - 1);
+      }
+    }
+  }, [_vm._v("Previous")])]), _vm._v(" "), _vm._l(_vm.lastPage, function (n) {
+    return _c("li", {
+      key: n,
+      staticClass: "page-item",
+      "class": {
+        active: _vm.currentPage === n
+      }
+    }, [_c("a", {
+      staticClass: "page-link",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.getPosts(n);
+        }
+      }
+    }, [_vm._v(_vm._s(n))])]);
+  }), _vm._v(" "), _c("li", {
+    staticClass: "page-item",
+    "class": {
+      disabled: _vm.currentPage === _vm.lastPage
+    }
+  }, [_c("a", {
+    staticClass: "page-link",
+    attrs: {
+      href: "#"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.getPosts(_vm.currentPage + 1);
+      }
+    }
+  }, [_vm._v("Next")])])], 2)])])]);
 };
 
 var staticRenderFns = [function () {
