@@ -4,13 +4,15 @@
             <div class="col text-center my-3"><h1>Posts</h1></div>
         </div>
         <div class="row row-cols-3">
-            <div v-for="(post, index) in posts" :key="index" class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ post.title }}</h5>
-                    <p class="card-text">
-                        {{ trimText(post.content, 100) }}
-                    </p>
-                    <a href="#" class="card-link">Card link</a>
+            <div v-for="(post, index) in posts" :key="index" class="col">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">
+                            {{ trimText(post.content, 100) }}
+                        </p>
+                        <a href="#" class="card-link">Card link</a>
+                    </div>
                 </div>
             </div>
         </div>

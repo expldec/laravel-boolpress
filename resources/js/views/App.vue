@@ -1,18 +1,21 @@
 <template>
     <div>
-        <!-- <WorkInProgress /> -->
-        <Posts />
+        <Header />
+        <!-- <Posts /> -->
+        <router-view></router-view>
     </div>
 </template>
 
 <script>
 // import WorkInProgress from '../components/WorkInProgress.vue';
-import Posts from '../components/Posts.vue';
+import Header from '../components/Header.vue';
+// import Posts from '../components/Posts.vue';
 export default {
     name: 'App',
     components: {
         // WorkInProgress
-        Posts,
+        // Posts,
+        Header,
     }
 }
 </script>
