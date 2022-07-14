@@ -90,11 +90,9 @@ class PostController extends Controller
     {
         $request->validate($this->getValidationRules());
         $data = $request->all();
-
         $post = Post::findOrFail($id);
         $data['slug'] = Post::generatePostSlugFromTitle($data['title']);
         $post->update($data);
-        $post->tags()->sync($data['tags']);
         if(isset($data['tags'])) {
             $post->tags()->sync($data['tags']);
         } else {

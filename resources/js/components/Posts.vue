@@ -4,17 +4,7 @@
             <div class="col text-center my-3"><h1>Posts</h1></div>
         </div>
         <div class="row row-cols-3">
-            <div v-for="(post, index) in posts" :key="index" class="col">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ post.title }}</h5>
-                        <p class="card-text">
-                            {{ trimText(post.content, 100) }}
-                        </p>
-                        <a href="#" class="card-link">Card link</a>
-                    </div>
-                </div>
-            </div>
+            <PostCard v-for="(post, index) in posts" :key="index" :post="post" />
         </div>
         <div class="row mt-3">
             <nav aria-label="Page navigation example">
@@ -56,8 +46,12 @@
 </template>
 
 <script>
+import PostCard from './PostCard.vue';
 export default {
     name: "Posts",
+    components: {
+        PostCard
+    },
     data() {
         return {
             posts: [],
@@ -84,12 +78,7 @@ export default {
                     this.totalPosts = resp.data.results.total;
                 });
         },
-        trimText(text, max) {
-            if (text.length > max) {
-                return text.substring(0, max) + "...";
-            }
-            return text;
-        },
+        
     },
 };
 </script>
