@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -30,7 +31,7 @@ class PostController extends Controller
     {
         $categories = Category::all();
         $tags = Tag::all();
-        return view('admin.posts.create',compact('categories','tags'));
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -41,14 +42,25 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+        // dd($request->image);
         $request->validate($this->getValidationRules());
         $data = $request->all();
+
+        if (isset($data['image'])) {
+            $image_path = Storage::put('post_covers', $data['image']);
+            // dd($image_path);
+            $data['cover'] = $image_path;
+        }
+
         $post = new Post();
         $post->fill($data);
         $post->slug = Post::generatePostSlugFromTitle($post->title);
         $post->save();
-        $post->tags()->sync($data['tags']);
+        if (isset($data['tags'])) {
+            $post->tags()->sync($data['tags']);
+        }
+
+
         return redirect()->route('admin.posts.show', ['post' => $post->id]);
     }
 
@@ -60,8 +72,8 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::findOrFail($id);   
-        $category = $post->category;     
+        $post = Post::findOrFail($id);
+        $category = $post->category;
         return view('admin.posts.show', compact('post', 'category'));
     }
 
@@ -76,7 +88,7 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         $categories = Category::all();
         $tags = Tag::all();
-        return view('admin.posts.edit', compact('post', 'categories','tags'));
+        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
     /**
@@ -91,11 +103,30 @@ class PostController extends Controller
         $request->validate($this->getValidationRules());
         $data = $request->all();
         $post = Post::findOrFail($id);
+
+        //se la richiesta contiene l'immagine
+        if (isset($data['image'])) {
+            //  E se il post ha già una sua immagine
+            if ($post->cover) {
+                //cancelliamo l'immagine esistente
+                Storage::delete($post->cover);
+            }
+            //  E salviamo comunque l'immagine nuova
+            $image_path = Storage::put('post_covers', $data['image']);
+            //  Salviamo il relativo path nel database
+            $data['cover'] = $image_path;
+        }
+
+        //generiamo lo slug dal titolo
         $data['slug'] = Post::generatePostSlugFromTitle($data['title']);
+        //aggiorniamo il record nel DB
         $post->update($data);
-        if(isset($data['tags'])) {
+        //se abbiamo tag nella request
+        if (isset($data['tags'])) {
+            //aggiorniamo la tabella post_tag
             $post->tags()->sync($data['tags']);
         } else {
+            //atrimenti aggiorniamola comunque con un array vuoto per eliminare tutti i record per il post da post_tag
             $post->tags()->sync([]);
         }
         return redirect()->route('admin.posts.show', ['post' => $post->id]);
@@ -109,18 +140,30 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
+        // individuiamo il post da cancellare facendo una query con il Model
         $post = Post::findOrFail($id);
+        // eliminiamo tutti i tag dalla tabella post_tag con un sync di un array vuoto
         $post->tags()->sync([]);
+
+        // se il Model ha l'attributo "cover" (l'immagine)
+        if($post->cover) {
+            // cancelliamo l'immagine dal filesystem
+            Storage::delete($post->cover);
+        }
+
+
         $post->delete();
         return redirect()->route('admin.posts.index');
     }
 
-    private function getValidationRules() {
+    private function getValidationRules()
+    {
         return [
             'title' => 'required|max:255',
             'content' => 'required|max:30000',
             'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:1024'
         ];
     }
 }
