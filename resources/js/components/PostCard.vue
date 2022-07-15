@@ -2,6 +2,7 @@
     <div class="col">
         <div class="card mb-3">
             <div class="card-body">
+                <img class="card-img-top" :src="post.cover" :alt="post.title">
                 <h5 class="card-title">{{ post.title }}</h5>
                 <p class="card-text">
                     {{ trimText(post.content, 100) }}
